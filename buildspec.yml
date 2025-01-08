@@ -31,7 +31,11 @@ phases:
       - echo `kubectl version --short --client`
       - python -m pip install --upgrade --force pip
       - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add
-      - apt-get update && apt-get -y install jq  && pip install --upgrade awscli pytest
+      - echo "Updating apt repositories"
+      - curl -fsSL https://apt.corretto.aws/corretto.key | sudo tee /etc/apt/trusted.gpg.d/corretto.asc
+      - sudo apt-get update || { echo "apt-get update failed"; exit 1; }
+      - sudo apt-get -y install jq || { echo "jq installation failed"; exit 1; }
+      - pip install --upgrade awscli pytest
   pre_build:
     commands:
       - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
@@ -43,7 +47,6 @@ phases:
   build:
     commands:
       - docker build --tag $REPOSITORY_URI:$TAG .
-
   post_build:
     commands:
       - docker push $REPOSITORY_URI:$TAG
