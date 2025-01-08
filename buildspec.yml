@@ -35,7 +35,10 @@ phases:
       - echo "Removing duplicate repository configuration"
       - sudo rm -f /etc/apt/sources.list.d/corretto.list
       - sudo sed -i '/corretto/d' /etc/apt/sources.list
-
+      # Remove old GPG keys (force a fresh download of the key)
+      - echo "Removing old GPG keys for Corretto"
+      - sudo rm -f /etc/apt/trusted.gpg.d/corretto.asc
+      - sudo rm -f /etc/apt/trusted.gpg.d/corretto*
       # Add the new GPG key for Amazon Corretto
       - echo "Adding the updated GPG key for Amazon Corretto"
       - curl -fsSL https://apt.corretto.aws/corretto.key | sudo tee /etc/apt/trusted.gpg.d/corretto.asc
