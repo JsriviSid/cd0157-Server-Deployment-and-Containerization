@@ -31,11 +31,16 @@ phases:
       - echo `kubectl version --short --client`
       - python -m pip install --upgrade --force pip
       - wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add
-      - # Add the new GPG key for Amazon Corretto
+      # Remove the existing duplicate repository configuration
+      - echo "Removing duplicate repository configuration"
+      - sudo rm -f /etc/apt/sources.list.d/corretto.list
+      - sudo sed -i '/corretto/d' /etc/apt/sources.list
+
+      # Add the new GPG key for Amazon Corretto
       - echo "Adding the updated GPG key for Amazon Corretto"
       - curl -fsSL https://apt.corretto.aws/corretto.key | sudo tee /etc/apt/trusted.gpg.d/corretto.asc
 
-      # Re-add the Amazon Corretto repository if needed
+      # Re-add the Amazon Corretto repository to the correct location
       - echo "Re-adding the Amazon Corretto repository"
       - echo "deb https://apt.corretto.aws stable main" | sudo tee /etc/apt/sources.list.d/corretto.list
 
